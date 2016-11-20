@@ -1,5 +1,6 @@
 var restify = require('restify');
 var builder = require('botbuilder');
+var numeral = require('numeral');
 
 //=========================================================
 // Bot Setup
@@ -13,8 +14,8 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
   
 // Create chat bot
 var connector = new builder.ChatConnector({
-  appId: process.env.MICROSOFT_APP_ID,
-  appPassword: process.env.MICROSOFT_APP_PASSWORD
+  appId: "bc40c9c0-9319-4265-941c-0bcfeab0c119",
+  appPassword: "CoSACNgb6kzkT0kfhK3uVm0"
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
@@ -78,7 +79,7 @@ intents.matches('換匯', [
       var exchange = getExchange(single);
       var amount = amountEntity.entity;
       if (exchange) {
-        session.send("換%d的%s要%d元", amount, single, amount * exchange);
+        session.send("換%s的%s要%s元", numeral(amount).format('0,0'), single, numeral(amount * exchange).format('0,0'));
       } else {
         session.send("目前不提供%s的換匯哦", single)
       }
@@ -94,44 +95,9 @@ intents.matches('換匯', [
       } else if (destinationExchange == undefined) {
         session.send("目前不提供%s的換匯哦", destination)
       } else {
-        session.send("%d的%s可以換到%d的%s", amount, source, amount * sourceExchange / destinationExchange, destination);
+        var total = numeral(amount * sourceExchange / destinationExchange).format('0,0');
+        session.send("%s的%s可以換到%s的%s",numeral(amount).format('0,0'), source, total, destination);
       }
     }
-  }
-]);
-
-
-bot.dialog('/exhange', [
-  function(session, args, next) {
-    console.log(args);
-    session.dialogData.args = args;
-    session.dialogData.order = {};
-    var lunchboxType = builder.EntityRecognizer.findEntity(args.entities, '便當');
-    if (!lunchboxType) {
-      builder.Prompts.text(session, '請問你今天想吃什麼飯');
-    } else {
-      session.dialogData.order.lunchboxType = lunchboxType.entity;
-      next();
-    }
-  },
-  function (session, results, next) {
-    if (results.response) {
-      session.dialogData.order.lunchboxType = results.response;
-    } 
-    var quantity = builder.EntityRecognizer.findEntity(session.dialogData.args.entities, 'builtin.number');
-    if (!quantity) {
-      builder.Prompts.number(session, "請問你想要訂幾個" + session.dialogData.order.lunchboxType);
-    } else {
-      session.dialogData.order.quantity = quantity.entity;
-      next();
-    }
-  },
-  function(session, results) {
-    if (results.response) {
-      session.dialogData.order.quantity = results.response;
-    }
-    var total = parseInt(session.dialogData.order.quantity) * 90;
-    session.send("%d個%s總共要%d元",session.dialogData.order.quantity, session.dialogData.order.lunchboxType, total);
-    session.endDialog();
   }
 ]);

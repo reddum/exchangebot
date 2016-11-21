@@ -71,11 +71,20 @@ intents.matches('換匯', [
     var sourceEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別::source");
     var destinationEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別::destination");
     var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'builtin.number');
-    
-    console.log("singleEntity", singleEntity);
+  
+    console.log("destinationEntity", destinationEntity);
   
     if (singleEntity != null) {
       var single = singleEntity.entity;
+      var exchange = getExchange(single);
+      var amount = amountEntity.entity;
+      if (exchange) {
+        session.send("換%s的%s要%s元", numeral(amount).format('0,0'), single, numeral(amount * exchange).format('0,0'));
+      } else {
+        session.send("目前不提供%s的換匯哦", single)
+      }
+    } else if (!destinationEntity && sourceEntity) {
+      var single = sourceEntity.entity;
       var exchange = getExchange(single);
       var amount = amountEntity.entity;
       if (exchange) {

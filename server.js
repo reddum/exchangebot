@@ -62,7 +62,20 @@ intents.matches('換匯', [
     var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'builtin.number');
     var amount = amountEntity.entity;
 
-    if (singleEntity != null) {
+    if (destinationEntity && sourceEntity) {
+      var source = sourceEntity.entity;
+      var destination = destinationEntity.entity;
+      var sourceExchange = getExchange(source);
+      var destinationExchange = getExchange(destination);
+      if (sourceExchange == undefined) {
+        session.send("目前不提供%s的換匯哦", source)
+      } else if (destinationExchange == undefined) {
+        session.send("目前不提供%s的換匯哦", destination)
+      } else {
+        var total = numeral(amount * sourceExchange / destinationExchange).format('0,0');
+        session.send("%s的%s可以換到%s的%s",numeral(amount).format('0,0'), source, total, destination);
+      }
+    } else if (singleEntity != null) {
       var single = singleEntity.entity;
       var exchange = getExchange(single);
       if (exchange) {
@@ -78,19 +91,6 @@ intents.matches('換匯', [
       } else {
         session.send("目前不提供%s的換匯哦", single)
       }
-    } else {
-      var source = sourceEntity.entity;
-      var destination = destinationEntity.entity;
-      var sourceExchange = getExchange(source);
-      var destinationExchange = getExchange(destination);
-      if (sourceExchange == undefined) {
-        session.send("目前不提供%s的換匯哦", source)
-      } else if (destinationExchange == undefined) {
-        session.send("目前不提供%s的換匯哦", destination)
-      } else {
-        var total = numeral(amount * sourceExchange / destinationExchange).format('0,0');
-        session.send("%s的%s可以換到%s的%s",numeral(amount).format('0,0'), source, total, destination);
-      }
-    }
+    }  
   }
 ]);

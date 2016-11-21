@@ -2,17 +2,11 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var numeral = require('numeral');
 
-//=========================================================
-// Bot Setup
-//=========================================================
-
-// Setup Restify Server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
   console.log('%s listening to %s', server.name, server.url); 
 });
   
-// Create chat bot
 var connector = new builder.ChatConnector({
   appId: "bc40c9c0-9319-4265-941c-0bcfeab0c119",
   appPassword: "CoSACNgb6kzkT0kfhK3uVm0"
@@ -20,10 +14,6 @@ var connector = new builder.ChatConnector({
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-
-//=========================================================
-// Bots Dialogs
-//=========================================================
 var LUIS_URL = 'https://api.projectoxford.ai/luis/v1/application?id=4ee4485b-081b-4557-b21d-4d062d97eeff&subscription-key=75ae07283a0949fbaae5792e8dc157b4&q=';
 var recognizer = new builder.LuisRecognizer(LUIS_URL);
 var intents = new builder.IntentDialog({ recognizers: [recognizer] });
@@ -49,7 +39,7 @@ intents.matches('查詢匯率', [
     var exchangeType = session.dialogData.exchangeType = typeEntity ? typeEntity.entity : null;
 
     if (exchangeType === null) {
-      builder.Prompts.choice(session, "請問您要查詢哪種假？", ["美元", "日圓", "人民幣"]);
+      builder.Prompts.choice(session, "請問您要查詢哪種匯率？", ["美元", "日圓", "人民幣"]);
     } else {
       next();
     }
@@ -66,18 +56,15 @@ intents.matches('查詢匯率', [
 
 intents.matches('換匯', [
   function (session, results, next) {
-
     var singleEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別");
     var sourceEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別::source");
     var destinationEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別::destination");
     var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'builtin.number');
-  
-    console.log("destinationEntity", destinationEntity);
-  
+    var amount = amountEntity.entity;
+
     if (singleEntity != null) {
       var single = singleEntity.entity;
       var exchange = getExchange(single);
-      var amount = amountEntity.entity;
       if (exchange) {
         session.send("換%s的%s要%s元", numeral(amount).format('0,0'), single, numeral(amount * exchange).format('0,0'));
       } else {
@@ -86,7 +73,6 @@ intents.matches('換匯', [
     } else if (!destinationEntity && sourceEntity) {
       var single = sourceEntity.entity;
       var exchange = getExchange(single);
-      var amount = amountEntity.entity;
       if (exchange) {
         session.send("換%s的%s要%s元", numeral(amount).format('0,0'), single, numeral(amount * exchange).format('0,0'));
       } else {
@@ -97,8 +83,6 @@ intents.matches('換匯', [
       var destination = destinationEntity.entity;
       var sourceExchange = getExchange(source);
       var destinationExchange = getExchange(destination);
-      var amount = amountEntity.entity;
-
       if (sourceExchange == undefined) {
         session.send("目前不提供%s的換匯哦", source)
       } else if (destinationExchange == undefined) {

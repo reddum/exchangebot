@@ -14,7 +14,7 @@ var connector = new builder.ChatConnector({
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-var LUIS_URL = 'https://api.projectoxford.ai/luis/v1/application?id=4ee4485b-081b-4557-b21d-4d062d97eeff&subscription-key=75ae07283a0949fbaae5792e8dc157b4&q=';
+var LUIS_URL = 'https://api.projectoxford.ai/luis/v1/application?id=6873493d-2816-4d0b-a08b-12c32b46ccf5&subscription-key=75ae07283a0949fbaae5792e8dc157b4&q=';
 var recognizer = new builder.LuisRecognizer(LUIS_URL);
 var intents = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', intents);
@@ -57,8 +57,8 @@ intents.matches('查詢匯率', [
 intents.matches('換匯', [
   function (session, results, next) {
     var singleEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別");
-    var sourceEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別::source");
-    var destinationEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別::destination");
+    var sourceEntity = builder.EntityRecognizer.findEntity(results.entities, "source");
+    var destinationEntity = builder.EntityRecognizer.findEntity(results.entities, "destination");
     var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'builtin.number');
     var amount = amountEntity.entity;
 

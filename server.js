@@ -47,7 +47,7 @@ intents.matches('查詢匯率', [
   function (session, results) {
     var exchangeType = session.dialogData.exchangeType;
     if (results.response) {
-      vacationType = results.response.entity;
+      exchangeType = results.response.entity;
     }
     console.log("exhange", getExchange(exchangeType));
     session.send("現在%s兌台幣是1:%f", exchangeType, getExchange(exchangeType));

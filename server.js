@@ -30,7 +30,7 @@ function getExchange(type) {
   return exchangeRate[type]
 }
 
-intents.onDefault(builder.DialogAction.send("很抱歉我不確定您想做什麼？試試[現在美元匯率」或「我有1000美金可以換多少台幣」"));
+intents.onDefault(builder.DialogAction.send("我能提供查詢匯率和匯率試算的功能 試試[現在美元匯率」或「我有1000美元可以換多少台幣」"));
 
 intents.matches('查詢匯率', [
   function (session, results, next) {
@@ -59,7 +59,7 @@ intents.matches('換匯', [
     var singleEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別");
     var sourceEntity = builder.EntityRecognizer.findEntity(results.entities, "source");
     var destinationEntity = builder.EntityRecognizer.findEntity(results.entities, "destination");
-    var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'builtin.number');
+    var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'number');
     var amount = amountEntity.entity;
 
     if (destinationEntity && sourceEntity) {

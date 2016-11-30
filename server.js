@@ -59,7 +59,7 @@ intents.matches('換匯', [
     var singleEntity = builder.EntityRecognizer.findEntity(results.entities, "幣別");
     var sourceEntity = builder.EntityRecognizer.findEntity(results.entities, "source");
     var destinationEntity = builder.EntityRecognizer.findEntity(results.entities, "destination");
-    var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'number');
+    var amountEntity = builder.EntityRecognizer.findEntity(results.entities, 'builtin.number');
     var amount = amountEntity.entity;
 
     if (destinationEntity && sourceEntity) {

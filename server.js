@@ -1,3 +1,5 @@
+
+
 var restify = require('restify');
 var builder = require('botbuilder');
 var numeral = require('numeral');
@@ -7,10 +9,18 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
   console.log('%s listening to %s', server.name, server.url); 
 });
   
+// var connector = new builder.ChatConnector({
+//   appId: "bc40c9c0-9319-4265-941c-0bcfeab0c119",
+//   appPassword: "CoSACNgb6kzkT0kfhK3uVm0"
+// });
+
+// Create connector and listen for messages
 var connector = new builder.ChatConnector({
-  appId: "bc40c9c0-9319-4265-941c-0bcfeab0c119",
-  appPassword: "CoSACNgb6kzkT0kfhK3uVm0"
+    appId: process.env.MICROSOFT_APP_ID,
+    appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
+
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
